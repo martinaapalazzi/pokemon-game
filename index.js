@@ -121,9 +121,20 @@ class Sprite {
     draw() {
         // IMPORTANTE la togliamo da 'onload' perchè tanto verranno disegnate comunque dato che le richiamiamo cosí tante volte in un loop
         // e per far si che vogliamo muovere la nostra mappa e player dobbiamo cambiare le cordinate
-                        // Ha 3 argomenti (variabile, cordinata X, cordinata Y)
-        context.drawImage(this.image, this.position.x, this.position.y); // API NON prendere stringhe quindi noi l'abbiamo messa nella const variabile
-                                // non usiamo misure statiche ma le prendiamo dalla class Sprite position X & Y.
+
+        // Facciamo questa cosa perche noi come players abbiamo 4 omini per far si che sembrano in movimento
+        context.drawImage(
+            this.image, // COSA 
+            0, // DA CHE PUNTO VUOI PARTIRE, MARGINE 0
+            0, // DA CHE ANGOLO VUOI PARTIRE, MARGINE 0
+            this.image.width / 4, // QUANTA LARGHEZZA VUOI TAGLIARE 
+            this.image.height, // QUANTA ALTEZZA VUOI TAGLIARE 
+            canvas.width / 2 - (this.image.width / 4) / 2, // DOVE VUOI POSIZIONARLO IN LARGHEZZA = 
+                                                            // metà della canvas - il nostro player diviso per 4 (perchè erano 4 omini) diviso a sua volta per due per posizionarlo a metà
+            canvas.height / 2 - this.image.height / 2, // DOVE VUOI POSIZIONARLO IN ALTEZZA
+            this.image.width / 4, // RIDICHIARARE LA NOSTRA WIDTH 
+            this.image.height, // RIDICHIARARE LA NOSTRA HEIGHT
+        );
     };
 };
 
@@ -153,38 +164,44 @@ const keys = {
     },
 }
 
+// Crea un quadratino rosso come collision per il nostro player
+const testBoundary = new Boundary ({
+    position: {
+        x: 400,
+        y: 400
+    }
+});
 // Aggiungere un animation loop per far si che se ci spostiamo cambiano le coordinate
 function animate () {
     window.requestAnimationFrame(animate); // Per creare un loop
         backgroundMap.draw();
 
-        boundaries.forEach(boundary => {
-            boundary.draw();
-        });
-        // Facciamo questa cosa perche noi come players abbiamo 4 omini per far si che sembrano in movimento
-        context.drawImage(
-            playerImg, // COSA 
-            0, // DA CHE PUNTO VUOI PARTIRE, MARGINE 0
-            0, // DA CHE ANGOLO VUOI PARTIRE, MARGINE 0
-            playerImg.width / 4, // QUANTA LARGHEZZA VUOI TAGLIARE 
-            playerImg.height, // QUANTA ALTEZZA VUOI TAGLIARE 
-            canvas.width / 2 - (playerImg.width / 4) / 2, // DOVE VUOI POSIZIONARLO IN LARGHEZZA = 
-                                                            // metà della canvas - il nostro player diviso per 4 (perchè erano 4 omini) diviso a sua volta per due per posizionarlo a metà
-            canvas.height / 2 - playerImg.height / 2, // DOVE VUOI POSIZIONARLO IN ALTEZZA
-            playerImg.width / 4, // RIDICHIARARE LA NOSTRA WIDTH 
-            playerImg.height, // RIDICHIARARE LA NOSTRA HEIGHT
-        );
+        // boundaries.forEach(boundary => {
+        //     boundary.draw();
+        // });
+
+        // Disegno il nostro Collision Player
+        testBoundary.draw();
+
     if (keys.w.pressed && lastKey === 'w') {
-        backgroundMap.position.y += 3
+        backgroundMap.position.y += 3,
+        // Per nonfar muovere il nostro Collision Player
+        testBoundary.position.y += 3
     }
     else if (keys.a.pressed && lastKey === 'a') {
-        backgroundMap.position.x += 3
+        backgroundMap.position.x += 3,
+        // Per nonfar muovere il nostro Collision Player
+        testBoundary.position.x += 3
     }
     else if (keys.s.pressed && lastKey === 's') {
-        backgroundMap.position.y -= 3
+        backgroundMap.position.y -= 3,
+        // Per nonfar muovere il nostro Collision Player
+        testBoundary.position.y -= 3
     }
     else if (keys.d.pressed && lastKey === 'd') {
-        backgroundMap.position.x -= 3
+        backgroundMap.position.x -= 3,
+        // Per nonfar muovere il nostro Collision Player
+        testBoundary.position.x -= 3
     }
 };
 animate();
