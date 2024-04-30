@@ -111,10 +111,16 @@ playerImg.src = './img/playerDown.png'; // salvare il suo src
 // A sprite is a 2-dimensional image used in video games or animation. 
 class Sprite {
             // Se aggiungi un oggetto dentro un argomento non dovrai preoccuparti di richiamare gli argomenti nell'ordine giusto 
-    constructor({ position, velocity, image }) { 
+    constructor({ position, velocity, image, frames = { max: 1} }) { 
         this.position =  position;
-        this.image = image
-        // this.mapImg = mapImg;
+        this.image = image;
+        this.frames = frames;
+        this.image.onload = () => {
+            this.width = this.image.width / this.frames.max,
+            this.height + this.image.height,
+            console.log(this.width);
+            console.log(this.height);
+        }
     };
 
     // Creare un method
@@ -127,16 +133,27 @@ class Sprite {
             this.image, // COSA 
             0, // DA CHE PUNTO VUOI PARTIRE, MARGINE 0
             0, // DA CHE ANGOLO VUOI PARTIRE, MARGINE 0
-            this.image.width / 4, // QUANTA LARGHEZZA VUOI TAGLIARE 
+            this.image.width / this.frames.max, // QUANTA LARGHEZZA VUOI TAGLIARE 
             this.image.height, // QUANTA ALTEZZA VUOI TAGLIARE 
-            canvas.width / 2 - (this.image.width / 4) / 2, // DOVE VUOI POSIZIONARLO IN LARGHEZZA = 
-                                                            // metà della canvas - il nostro player diviso per 4 (perchè erano 4 omini) diviso a sua volta per due per posizionarlo a metà
-            canvas.height / 2 - this.image.height / 2, // DOVE VUOI POSIZIONARLO IN ALTEZZA
-            this.image.width / 4, // RIDICHIARARE LA NOSTRA WIDTH 
+            this.position.x,
+            this.position.y,
+            this.image.width / this.frames.max, // RIDICHIARARE LA NOSTRA WIDTH 
             this.image.height, // RIDICHIARARE LA NOSTRA HEIGHT
         );
     };
 };
+
+const player = new Sprite({
+    position: {               // 192 & 68 = dimentions dell immagini
+        x: canvas.width / 2 - (192 / 4) / 2, // DOVE VUOI POSIZIONARLO IN LARGHEZZA = 
+                                                        // metà della canvas - il nostro player diviso per 4 (perchè erano 4 omini) diviso a sua volta per due per posizionarlo a metà ,
+        y: canvas.height / 2 - 68 / 2, // DOVE VUOI POSIZIONARLO IN ALTEZZA ,
+    },
+    image: playerImg,
+    frames: {
+        max: 4
+    }
+});
 
 // Per la nostra Mappa
 const backgroundMap = new Sprite ({
@@ -174,14 +191,23 @@ const testBoundary = new Boundary ({
 // Aggiungere un animation loop per far si che se ci spostiamo cambiano le coordinate
 function animate () {
     window.requestAnimationFrame(animate); // Per creare un loop
-        backgroundMap.draw();
+    backgroundMap.draw();
 
-        // boundaries.forEach(boundary => {
-        //     boundary.draw();
-        // });
+    // boundaries.forEach(boundary => {
+    //     boundary.draw();
+    // });
 
-        // Disegno il nostro Collision Player
-        testBoundary.draw();
+    // Disegno il nostro Collision Player
+    testBoundary.draw();
+    player.draw();
+
+    if (player.position.x + player.width >= testBoundary.position.x && 
+        player.position.x <= testBoundary.position.x + testBoundary.width &&
+        player.position.y <= testBoundary.position.y + testBoundary.height &&
+        player.position.y + player.height >= testBoundary.position.y)
+    {
+        console.log('colliding')
+    }
 
     if (keys.w.pressed && lastKey === 'w') {
         backgroundMap.position.y += 3,
